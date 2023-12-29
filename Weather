@@ -1,0 +1,67 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import LabelEncoder
+import plotly.express as px
+import streamlit as st
+
+# Load the dataset
+d = pd.read_csv('weather1.csv')
+
+# Extract features and target variable
+x = d.iloc[:, :-1].values
+y = d.iloc[:, -1].values
+
+# Encode the target variable
+l2 = LabelEncoder()
+y = l2.fit_transform(y)
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+
+l = RandomForestClassifier()
+l.fit(x_train, y_train)
+
+st.header("Weather prediction")
+
+y_input = st.number_input("Enter year")
+st.write("You entered year is", y_input)
+
+h_input = st.number_input("Enter humidity")
+st.write("Humidity is", h_input)
+
+t_input = st.number_input("Enter temperature")
+st.write("Temperature is", t_input)
+
+p_input = st.number_input("Enter pressure")
+st.write("Pressure is", p_input)
+
+wind_input = st.number_input("Enter wind")
+st.write("Wind is", wind_input)
+
+pre_input = st.number_input("Enter precipitation")
+st.write("Precipitation is", pre_input)
+
+res_input = st.selectbox("Choose an option:", options=['cool', 'sunny', 'cloudy', 'Normal', 'Average'])
+if res_input == "cool":
+    res_input = 0
+elif res_input == "sunny":
+    res_input = 1
+elif res_input == "cloudy":
+    res_input = 2
+elif res_input == "Normal":
+    res_input = 3
+elif res_input == "Average":
+    res_input = 4
+
+if st.button("Predict"):
+    data = [[y_input, h_input, t_input, p_input, wind_input, pre_input]]
+    prediction = l.predict(data)
+    st.success("Predicted value is " + str(prediction))
+
+
+st.subheader("Graph")
+
+#d['result_numeric'] = l2.transform(d['result'])
+
+chart_data = pd.DataFrame({'Year': d['Year'], 'temperatur': d['temperatur']})
+st.line_chart(chart_data[['Year', 'temperatur']])
